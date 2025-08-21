@@ -1,12 +1,11 @@
-# Genkit Langfuse Plugin (Alpha)
+# Genkit Langfuse Plugin
 
-The (unofficial) Langfuse plugin provides observability and tracing for your Genkit applications by exporting traces to [Langfuse](https://langfuse.com/).
-This is an early alpha release and bugs are expected
+The Genkit Langfuse plugin provides observability and tracing for your Genkit applications by automatically exporting traces to [Langfuse](https://langfuse.com/).
 
 ## Installation
 
 ```bash
-npm install @genkit-ai/langfuse
+npm install genkit-langfuse
 ```
 
 ## Configuration
@@ -21,12 +20,39 @@ export LANGFUSE_BASE_URL="https://cloud.langfuse.com"  # optional, defaults to c
 
 ## Usage
 
-### Basic Setup
+### Plugin Approach (Recommended)
+
+The plugin can be registered with Genkit's plugin system:
 
 ```typescript
-import { enableLangfuseTelemetry } from '@genkit-ai/langfuse';
+import { genkit } from 'genkit';
+import { langfuse } from 'genkit-langfuse';
 
-// Enable Langfuse telemetry
+const ai = genkit({
+  plugins: [
+    langfuse({
+      secretKey: process.env.LANGFUSE_SECRET_KEY!,
+      publicKey: process.env.LANGFUSE_PUBLIC_KEY!,
+      baseUrl: process.env.LANGFUSE_BASE_URL, // optional
+      debug: true, // optional
+    })
+  ],
+});
+```
+
+### Standalone Telemetry Setup
+
+Alternatively, you can enable telemetry independently:
+
+```typescript
+import { enableLangfuseTelemetry } from 'genkit-langfuse';
+import { genkit } from 'genkit';
+
+const ai = genkit({
+  plugins: [/* your other plugins */],
+});
+
+// Enable Langfuse telemetry after genkit initialization
 await enableLangfuseTelemetry({
   secretKey: process.env.LANGFUSE_SECRET_KEY!,
   publicKey: process.env.LANGFUSE_PUBLIC_KEY!,

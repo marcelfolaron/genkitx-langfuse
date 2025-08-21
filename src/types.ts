@@ -25,6 +25,16 @@ export interface LangfuseConfig {
   
   /** Filter function to include/exclude spans */
   spanFilter?: (span: SpanData) => boolean;
+  
+  // Development/production configuration following Genkit patterns
+  /** Force export in development environment (default: false) */
+  forceDevExport?: boolean;
+  
+  /** Export timeout in milliseconds (default: 30000) */
+  exportTimeoutMillis?: number;
+  
+  /** Maximum queue size for batch processor (default: 1000) */
+  maxQueueSize?: number;
 }
 
 /**
