@@ -3,10 +3,6 @@ import { vertexAI } from '@genkit-ai/vertexai';
 import { genkit, z } from 'genkit';
 import { enableLangfuseTelemetry } from 'genkit-langfuse';
 
-// Set environment variables
-process.env.GOOGLE_CLOUD_PROJECT = "genkitdev";
-process.env.GOOGLE_GENAI_API_KEY = "AIzaSyDZsVgagmtvGhF2jcVnqXQBVzXqNzUuNNw";
-
 // Initialize everything in an async IIFE to handle top-level await
 let ai: any;
 let jokeFlow: any;
