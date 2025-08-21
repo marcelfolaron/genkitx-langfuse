@@ -15,7 +15,7 @@ let jokeFlow: any;
         await enableLangfuseTelemetry({
             secretKey: 'SECRET',
             publicKey: 'PUBLIC',
-            baseUrl: 'https://ai.telemetry.infra.leantime.io',
+            baseUrl: 'Langfuse-URL',
             debug: true,
             forceDevExport: true, // Enable development export like Firebase plugin
             exportTimeoutMillis: 10000, // 10 seconds like Firebase plugin example
