@@ -13,8 +13,8 @@ let jokeFlow: any;
 
         // Enable Langfuse telemetry following Genkit patterns
         await enableLangfuseTelemetry({
-            secretKey: 'sk-lf-499bdc6f-5fe1-442c-b356-361e2c20e24c',
-            publicKey: 'pk-lf-3b682c68-092b-4957-be64-594ce0f18252',
+            secretKey: 'SECRET',
+            publicKey: 'PUBLIC',
             baseUrl: 'https://ai.telemetry.infra.leantime.io',
             debug: true,
             forceDevExport: true, // Enable development export like Firebase plugin
