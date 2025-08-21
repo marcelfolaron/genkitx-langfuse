@@ -48,6 +48,18 @@ export class LangfuseExporter implements SpanExporter {
         });
       }
     });
+    
+    // Add HTTP success debugging if available
+    if (config.debug && this.langfuse.on) {
+      // Try to listen for success events if the SDK supports them
+      try {
+        this.langfuse.on('trace', () => {
+          console.log('✅ [DEBUG] Langfuse trace event sent successfully');
+        });
+      } catch (e) {
+        // SDK might not support this event
+      }
+    }
 
     // Add debug logging for successful operations
     if (config.debug) {
@@ -103,11 +115,15 @@ export class LangfuseExporter implements SpanExporter {
         console.log(`📊 [DEBUG] Export summary: ${successCount} successful, ${errorCount} failed`);
       }
       
-      // Trigger immediate flush for debug visibility
+      // Trigger immediate flush for debug visibility with success logging
       if (this.config.debug && successCount > 0) {
-        this.langfuse.flushAsync().catch(error => 
-          console.error('🚨 [ERROR] Failed to flush after export:', error)
-        );
+        this.langfuse.flushAsync()
+          .then(() => {
+            console.log('✅ [DEBUG] Post-export flush completed successfully');
+          })
+          .catch(error => {
+            console.error('🚨 [ERROR] Failed to flush after export:', error);
+          });
       }
       
       resultCallback({ code: ExportResultCode.SUCCESS });
@@ -134,6 +150,7 @@ export class LangfuseExporter implements SpanExporter {
     
     try {
       console.log('🔍 [DEBUG] Testing Langfuse connection...');
+      console.log('🔍 [DEBUG] Langfuse API URL:', this.config.baseUrl);
       
       // Create a simple test trace to verify connectivity
       const testTrace = {
@@ -146,6 +163,7 @@ export class LangfuseExporter implements SpanExporter {
       this.langfuse.trace(testTrace);
       
       // Attempt immediate flush
+      console.log('🔍 [DEBUG] Flushing connection test trace...');
       await this.langfuse.flushAsync();
       console.log('✅ [DEBUG] Langfuse connection test completed');
     } catch (error) {
