@@ -17,3 +17,5 @@ docs
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+/.codebuddy
+/.idea

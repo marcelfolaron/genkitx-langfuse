@@ -1,5 +1,5 @@
 {
-  "name": "@genkit-ai/langfuse",
+  "name": "genkit-langfuse",
   "description": "Genkit AI framework plugin for Langfuse observability and tracing.",
   "keywords": [
     "genkit",
@@ -14,6 +14,15 @@
   ],
   "version": "0.1.0",
   "type": "commonjs",
+  "main": "./lib/index.js",
+  "files": [
+    "lib/**/*",
+    "README.md",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "check": "tsc",
     "compile": "tsup-node",
@@ -24,10 +33,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/firebase/genkit.git",
-    "directory": "js/plugins/langfuse"
+    "url": "https://github.com/marcelfolaron/genkitx-langfuse.git"
   },
-  "author": "genkit",
+  "homepage": "https://github.com/marcelfolaron/genkitx-langfuse",
+  "bugs": {
+    "url": "https://github.com/marcelfolaron/genkitx-langfuse/issues"
+  },
+  "author": "Marcel Folaron",
   "license": "Apache-2.0",
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
@@ -37,11 +49,14 @@
     "langfuse": "^3.28.0"
   },
   "peerDependencies": {
-    "genkit": "workspace:^"
+    "genkit": "^1.16.1"
   },
   "devDependencies": {
+    "@genkit-ai/ai": "^1.16.1",
+    "@genkit-ai/googleai": "^1.16.1",
     "@jest/globals": "^29.7.0",
     "@types/node": "^20.11.16",
+    "genkit": "^1.16.1",
     "jest": "^29.7.0",
     "npm-run-all": "^4.1.5",
     "openai": "^4.0.0",
@@ -49,7 +64,8 @@
     "ts-jest": "^29.1.2",
     "tsup": "^8.3.5",
     "tsx": "^4.19.2",
-    "typescript": "^4.9.0"
+    "typescript": "^4.9.0",
+    "zod": "^3.25.76"
   },
   "types": "./lib/index.d.ts",
   "exports": {
