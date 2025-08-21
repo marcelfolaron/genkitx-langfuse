@@ -1,6 +1,7 @@
-# Genkit Langfuse Plugin
+# Genkit Langfuse Plugin (Alpha)
 
 The Langfuse plugin provides observability and tracing for your Genkit applications by exporting traces to [Langfuse](https://langfuse.com/).
+This is an early alpha release and bugs are expected
 
 ## Installation
 
