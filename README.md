@@ -35,6 +35,7 @@ const ai = genkit({
       publicKey: process.env.LANGFUSE_PUBLIC_KEY!,
       baseUrl: process.env.LANGFUSE_BASE_URL, // optional
       debug: true, // optional
+      forceDevExport: true, // enable in development
     })
   ],
 });
@@ -42,22 +43,23 @@ const ai = genkit({
 
 ### Standalone Telemetry Setup
 
-Alternatively, you can enable telemetry independently:
+Alternatively, you can enable telemetry independently (useful for advanced configurations):
 
 ```typescript
 import { enableLangfuseTelemetry } from 'genkit-langfuse';
 import { genkit } from 'genkit';
 
-const ai = genkit({
-  plugins: [/* your other plugins */],
-});
-
-// Enable Langfuse telemetry after genkit initialization
+// Enable Langfuse telemetry before genkit initialization
 await enableLangfuseTelemetry({
   secretKey: process.env.LANGFUSE_SECRET_KEY!,
   publicKey: process.env.LANGFUSE_PUBLIC_KEY!,
   baseUrl: process.env.LANGFUSE_BASE_URL, // optional
   debug: true, // optional
+  forceDevExport: true, // enable in development
+});
+
+const ai = genkit({
+  plugins: [/* your other plugins */],
 });
 ```
 
@@ -69,17 +71,23 @@ await enableLangfuseTelemetry({
   publicKey: process.env.LANGFUSE_PUBLIC_KEY!,
   baseUrl: 'https://your-langfuse-instance.com',
   debug: true,
-  flushAt: 10, // batch size
-  flushInterval: 5000, // flush interval in ms
+  
+  // Development vs Production settings (following Genkit patterns)
+  forceDevExport: true, // Force export in development
+  flushAt: 1, // Immediate export in dev (20 in production)
+  flushInterval: 1000, // 1s in dev (10s in production)
+  exportTimeoutMillis: 10000, // HTTP timeout
+  maxQueueSize: 1000, // Max queued spans
   
   // Custom cost calculation
   calculateCost: (modelName, usage) => {
     const rates = {
-      'gpt-4': { input: 0.03, output: 0.06 },
-      'gpt-3.5-turbo': { input: 0.001, output: 0.002 },
+      'gemini-1.5-flash': { input: 0.075, output: 0.3 },
+      'gemini-1.5-pro': { input: 3.5, output: 10.5 },
+      'gpt-4': { input: 30, output: 60 },
     };
     const rate = rates[modelName] || { input: 0, output: 0 };
-    return (usage.inputTokens * rate.input + usage.outputTokens * rate.output) / 1000;
+    return (usage.inputTokens * rate.input + usage.outputTokens * rate.output) / 1_000_000;
   },
   
   // Custom span filtering
@@ -135,40 +143,83 @@ calculateCost: (modelName, usage) => {
 ## What Gets Exported
 
 ### Generations (LLM Calls)
-- Model name and provider
+- Model name and provider (e.g., `googleai/gemini-1.5-flash`)
 - Input prompts and configuration
 - Output responses and token usage
-- Execution timing
+- Execution timing and performance metrics
 - Session and user context
+- Cost estimation (if configured)
 
 ### Traces (Flows/Root Operations)
 - Flow name and input/output
 - Total execution time
 - Session context
 - Nested span hierarchy
+- Complete request lifecycle
 
 ### Spans (Intermediate Operations)
-- Operation name and type
+- Operation name and type (tools, utilities, etc.)
 - Input/output data
 - Execution timing
 - Parent-child relationships
+- Genkit-specific metadata
 
-## Debugging
+## Development & Debugging
 
-Enable debug mode to see what's being sent to Langfuse:
+### Development Mode
+
+The plugin automatically detects development environment and uses faster export settings:
 
 ```typescript
+// Automatically enables immediate export in development
 await enableLangfuseTelemetry({
-  // ... other config
-  debug: true,
+  secretKey: process.env.LANGFUSE_SECRET_KEY!,
+  publicKey: process.env.LANGFUSE_PUBLIC_KEY!,
+  forceDevExport: true, // Force development behavior
+  debug: true, // Enable detailed logging
 });
 ```
+
+### Debug Output
+
+With `debug: true`, you'll see detailed logs including:
+- Span lifecycle (start/end)
+- Export batches and success status
+- HTTP communication status
+- Langfuse API responses
+- Performance metrics
+
+### Troubleshooting
+
+If traces aren't appearing in Langfuse:
+1. Check debug logs for HTTP errors
+2. Verify credentials are correct
+3. Ensure `forceDevExport: true` in development
+4. Check network connectivity to Langfuse API
+```
+
+## Configuration Options
+
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `secretKey` | string | ✅ | - | Langfuse secret key |
+| `publicKey` | string | ✅ | - | Langfuse public key |
+| `baseUrl` | string | ❌ | `https://cloud.langfuse.com` | Langfuse API base URL |
+| `debug` | boolean | ❌ | `false` | Enable detailed logging |
+| `forceDevExport` | boolean | ❌ | `false` | Force export in development |
+| `flushAt` | number | ❌ | 1 (dev) / 20 (prod) | Batch size for exports |
+| `flushInterval` | number | ❌ | 1000 (dev) / 10000 (prod) | Export interval in ms |
+| `exportTimeoutMillis` | number | ❌ | 30000 | HTTP request timeout |
+| `maxQueueSize` | number | ❌ | 1000 | Maximum queued spans |
+| `calculateCost` | function | ❌ | - | Custom cost calculation |
+| `spanFilter` | function | ❌ | - | Filter which spans to export |
 
 ## Environment Variables
 
 - `LANGFUSE_SECRET_KEY`: Your Langfuse secret key (required)
 - `LANGFUSE_PUBLIC_KEY`: Your Langfuse public key (required)  
 - `LANGFUSE_BASE_URL`: Langfuse API base URL (optional, defaults to cloud)
+- `NODE_ENV`: Automatically detected for development settings
 
 ## TypeScript Support
 

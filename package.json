@@ -1,5 +1,5 @@
 {
-  "name": "genkit-langfuse",
+  "name": "genkitx-langfuse",
   "description": "Genkit AI framework plugin for Langfuse observability and tracing.",
   "keywords": [
     "genkit",
